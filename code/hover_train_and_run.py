@@ -27,6 +27,7 @@ BONUS_REWARD = 1_000
 PENALTY = -1
 PRINT_EVERY =20
 MAX_EPISODES = 3_000 #10_000 #50000 #10000
+MAX_EPISODES = 5
 MAX_TIMESTEPS = 350 #1500  # Batch size
 UPDATE_TIMESTEP = 350 #4000  # Batch size
 MINI_BATCH__SIZE = 64 #500 mini-batch size
@@ -35,7 +36,7 @@ K_EPOCHS = 10 #10
 GAMMA = 0.99
 lr = 0.0001
 betas = (.9, 0.999)
-LOG_PATH = 'logs'
+LOG_PATH = 'logs/exp1'
 MODEL_PATH = 'models'
 
 
@@ -157,7 +158,7 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
     if force_break:
         break
       
-    if i_episode % 5 == 0:
+    if i_episode % 50 == 0:
         plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
 
     
@@ -178,7 +179,7 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
 
     # save every 500 episodes
     if i_episode % 500 == 0:
-        torch.save(ppo.policy.state_dict(), '{}PPO_{}.pth'.format(MODEL_PATH, ENV))
+        torch.save(ppo.policy.state_dict(), '{}/PPO_{}.pth'.format(MODEL_PATH, ENV))
 
     # logging
     summary_writer.add_scalar('avg episode length', avg_length, i_episode)
@@ -201,12 +202,12 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
 time_elapsed = time.perf_counter() - start_time
 print('Time elapsed: {}min: {}sec'.format(time_elapsed//60, time_elapsed % 60))
 
-torch.save(ppo.policy.state_dict(), '{}PPO_{}.pth'.format(MODEL_PATH, ENV))
+torch.save(ppo.policy.state_dict(), '{}/PPO_{}.pth'.format(MODEL_PATH, ENV))
 
 
 
 
-
+print("start testing")
 ################################################
 ### TESTING                                    #
 ################################################
@@ -260,8 +261,8 @@ while not reached and iter < MAX_ITER:
     sim_sum_rewards += reward
     sim_run_rew_plot.append(sim_sum_rewards)
 
-    if iter % 1000 == 0:
-        plot_hover_result(iter, sim_memory.rewards, sim_run_rew_plot, sim_memory.states, True)
+    # if iter % 1000 == 0:
+    #     plot_hover_result(iter, sim_memory.rewards, sim_run_rew_plot, sim_memory.states, True)
 
 
     if done:
