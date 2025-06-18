@@ -35,8 +35,8 @@ K_EPOCHS = 10 #10
 GAMMA = 0.99
 lr = 0.0001
 betas = (.9, 0.999)
-LOG_PATH = 'logs'
-MODEL_PATH = 'models'
+LOG_PATH = ''
+MODEL_PATH = ''
 
 
 
@@ -58,7 +58,6 @@ env.penalty = PENALTY
 state_dim = env.observation_space
 action_dim = env.action_space
 random_seed = 10
-
 if random_seed:
     print("Random Seed: {}".format(random_seed))
     torch.manual_seed(random_seed)
@@ -89,8 +88,7 @@ sum_rewards = 0
 sum_rewards_plot = []
 state = env.reset()
 force_break = False
-start_time = time.perf_counter()
-
+start_time = time.clock()
 
 for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
 
@@ -100,29 +98,28 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
     state[2] = np.random.randint(20, 30)
 
     if i_episode % 10 == 0:
-        env.target_thresh = max(0.5, env.target_thresh*0.9)
+      env.target_thresh = max(0.5, env.target_thresh*0.9)
     
 
-    # for t in tqdm(range(MAX_TIMESTEPS), desc='Running environment'):
-    for t in range(MAX_TIMESTEPS):
+    for t in tqdm(range(MAX_TIMESTEPS), desc='Running environment'):
         time_step += 1
         num_transitions += 1
         # Running policy_old:
         action = ppo.select_action(state, memory)
         act_count = 0
         while np.any(np.isnan(action)) and not force_break:
-            print('in between episode: action is nan',  action)
-            action = ppo.select_action(state, memory)
-            state = env.reset()
-            act_count += 1
-            if act_count > 5:
-                force_break = True
+          print('in between episode: action is nan',  action)
+          action = ppo.select_action(state, memory)
+          state = env.reset()
+          act_count += 1
+          if act_count > 5:
+            force_break = True
 
 
         state, reward, done= env.step(action)
         if math.isnan(reward) or math.isnan(state[0]):
-            force_break = True
-            break
+          force_break = True
+          break
 
         poses.append(state[:9])
 
@@ -143,25 +140,22 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
         if RENDER:
             env.render()
         if done:
-            print('Done returned!')
+            print('\nDone returned!\n')
             state = env.reset()
             state[0] = np.random.randint(20, 30)
             state[1] = np.random.randint(20, 30)
             state[2] = np.random.randint(20, 30)
             break
 
-        # if num_transitions % 500 == 0:
-        #     plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
+        if num_transitions % 500 == 0:
+          plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
     
     
     if force_break:
-        break
+      break
       
-    if i_episode % 5 == 0:
-        plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
-
-    
-    # print("\ngoing to train the model")
+        
+    print("going to train the model")
     ppo.update(memory)
     memory.clear_memory()
 
@@ -177,7 +171,7 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
     '''
 
     # save every 500 episodes
-    if i_episode % 500 == 0:
+    if i_episode % 50 == 0:
         torch.save(ppo.policy.state_dict(), '{}PPO_{}.pth'.format(MODEL_PATH, ENV))
 
     # logging
@@ -189,8 +183,8 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
         avg_length = int(avg_length / PRINT_EVERY)
         running_reward = int((running_reward / PRINT_EVERY))
 
-        time_elapsed = time.perf_counter() - start_time
-        print('\nTime elapsed: {}min: {}sec \nEpisode {} \t Avg length: {} \t Avg reward: {}'.format(time_elapsed//60, time_elapsed % 60, i_episode, avg_length, running_reward))
+        time_elapsed = time.clock() - start_time
+        print('Time elapsed: {}min: {}sec \nEpisode {} \t Avg length: {} \t Avg reward: {}'.format(time_elapsed//60, time_elapsed % 60, i_episode, avg_length, running_reward))
         running_reward = 0
         avg_length = 0
         
@@ -198,10 +192,8 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
 
 
 #plot(num_transitions, rewards_plot, poses)
-time_elapsed = time.perf_counter() - start_time
+time_elapsed = time.clock() - start_time
 print('Time elapsed: {}min: {}sec'.format(time_elapsed//60, time_elapsed % 60))
-
-torch.save(ppo.policy.state_dict(), '{}PPO_{}.pth'.format(MODEL_PATH, ENV))
 
 
 
@@ -230,44 +222,44 @@ MAX_ITER = 40_000
 
 while not reached and iter < MAX_ITER:
 
+  action = ppo.select_action(state, memory)
+  transitions += 1
+
+  if iter % 300 == 0:
+    state = env.reset()
+    state[0] = np.random.randint(0, 5)
+    state[1] = np.random.randint(0, 5)
+    state[2] = np.random.randint(0, 5)
+  
+  
+  act_count = 0
+  while np.any(np.isnan(action)) and not force_break:
+    print('in between episode: action is nan',  action)
     action = ppo.select_action(state, memory)
-    transitions += 1
-
-    if iter % 300 == 0:
-        state = env.reset()
-        state[0] = np.random.randint(0, 5)
-        state[1] = np.random.randint(0, 5)
-        state[2] = np.random.randint(0, 5)
-
-
-    act_count = 0
-    while np.any(np.isnan(action)) and not force_break:
-        print('in between episode: action is nan',  action)
-        action = ppo.select_action(state, memory)
-        state = env.reset()
-        state[0] = np.random.randint(0, 5)
-        state[1] = np.random.randint(0, 5)
-        state[2] = np.random.randint(0, 5)
-        act_count += 1
-        if act_count > 5:
-            force_break = True
+    state = env.reset()
+    state[0] = np.random.randint(0, 5)
+    state[1] = np.random.randint(0, 5)
+    state[2] = np.random.randint(0, 5)
+    act_count += 1
+    if act_count > 5:
+      force_break = True
 
 
-    state, reward, done= env.step(action)
-    sim_memory.states.append(state[:9])
-    sim_memory.rewards.append(reward)
+  state, reward, done= env.step(action)
+  sim_memory.states.append(state[:9])
+  sim_memory.rewards.append(reward)
 
-    sim_sum_rewards += reward
-    sim_run_rew_plot.append(sim_sum_rewards)
+  sim_sum_rewards += reward
+  sim_run_rew_plot.append(sim_sum_rewards)
 
-    if iter % 1000 == 0:
-        plot_hover_result(iter, sim_memory.rewards, sim_run_rew_plot, sim_memory.states, True)
+  if iter % 1000 == 0:
+    plot_hover_result(iter, sim_memory.rewards, sim_run_rew_plot, sim_memory.states, True)
 
 
-    if done:
-        reached = True
+  if done:
+    reached = True
 
-    iter += 1
+  iter += 1
 
 
 #memory.clear_memory()

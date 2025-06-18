@@ -71,7 +71,7 @@ class HoverTaskEnv:
         curr_pos = state[:3]
         dist = np.linalg.norm(curr_pos-self.target_position)
         if (dist <= self.target_thresh):
-            print('Inside the threshold limit')
+            print('\nInside the threshold limit')
             return True, self.bonus_reward
         
         return False, 0
