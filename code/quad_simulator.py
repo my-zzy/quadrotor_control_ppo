@@ -240,12 +240,6 @@ if __name__ == "__main__":
     #time.sleep(200)
     # Save all frames to animated gif
     imageio.mimsave("movie_traj.gif", images)
-    
-
-
-    
-
-    
 
 
 
