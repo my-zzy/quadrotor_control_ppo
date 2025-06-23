@@ -25,7 +25,7 @@ RENDER = False
 SOLVED_REWARD = 300
 BONUS_REWARD = 1_000
 PENALTY = -1
-PRINT_EVERY =20
+PRINT_EVERY = 20
 MAX_EPISODES = 3_000 #10_000 #50000 #10000
 MAX_TIMESTEPS = 350 #1500  # Batch size
 UPDATE_TIMESTEP = 350 #4000  # Batch size
@@ -157,8 +157,8 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
     if force_break:
         break
 
-    if i_episode % 500 == 0:
-        plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
+    # if i_episode % 500 == 0:
+    #     plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
 
     
     # print("\ngoing to train the model")
@@ -190,7 +190,7 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
         running_reward = int((running_reward / PRINT_EVERY))
 
         time_elapsed = time.perf_counter() - start_time
-        print('\nTime elapsed: {}min: {}sec \nEpisode {} \t Avg length: {} \t Avg reward: {}'.format(time_elapsed//60, time_elapsed % 60, i_episode, avg_length, running_reward))
+        print('\nTime elapsed: {}min {}sec \nEpisode {} \t Avg length: {} \t Avg reward: {}'.format(time_elapsed//60, round(time_elapsed % 60, 4), i_episode, avg_length, running_reward))
         running_reward = 0
         avg_length = 0
         
@@ -201,6 +201,7 @@ for i_episode in tqdm(range(1, MAX_EPISODES + 1), desc='Training'):
 time_elapsed = time.perf_counter() - start_time
 print('Time elapsed: {}min: {}sec'.format(time_elapsed//60, time_elapsed % 60))
 
+plot_hover_result(num_transitions, rewards_plot, sum_rewards_plot, poses, True)
 torch.save(ppo.policy.state_dict(), '{}/PPO_{}.pth'.format(MODEL_PATH, ENV))
 
 

@@ -174,7 +174,7 @@ class Memory:
 
 
 def load_states():
-    dbfile = open('state_results_traj.pickle', 'rb')      
+    dbfile = open('state_results_traj.pickle', 'rb')
     states = pickle.load(dbfile)
     dbfile.close()
     return states
@@ -182,7 +182,7 @@ def load_states():
 
 if __name__ == "__main__":
 
-    exportPath = './video_traj/'       
+    exportPath = '../results/video_traj/'
     if not os.path.exists(exportPath):
         os.makedirs(exportPath)
 
@@ -209,12 +209,12 @@ if __name__ == "__main__":
     images = []
 
     quad_sim = QuadrotorSimulator(
-                    x=init_state[0], 
-                    y=init_state[1], 
-                    z=init_state[2],  
-                    roll=init_state[3], 
-                    pitch=init_state[4], 
-                    yaw=init_state[5], 
+                    x=init_state[0],
+                    y=init_state[1],
+                    z=init_state[2],
+                    roll=init_state[3],
+                    pitch=init_state[4],
+                    yaw=init_state[5],
                     title=title,
                     filepath=filepath)
     quad_sim.set_target(0.0, 0.0, 0.0)
@@ -224,11 +224,11 @@ if __name__ == "__main__":
     for i, state in enumerate(states[-3000:]):
         filepath = "{}frame_{:04}.png".format(exportPath, i+1)
         quad_sim.update_pose(i,
-                        x=state[0], 
-                        y=state[1], 
-                        z=state[2], 
+                        x=state[0],
+                        y=state[1],
+                        z=state[2],
                         roll=state[3],
-                        pitch=state[4], 
+                        pitch=state[4],
                         yaw=state[5],
                         reward=0,
                         title=title,
